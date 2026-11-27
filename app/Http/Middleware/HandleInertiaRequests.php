@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
                     'telephone' => $user->telephone,
                     'email_verified_at' => $user->email_verified_at,
                     'roles' => $user->getRoleNames(),
+                    'service_id' => $user->medecin?->service_id ?? $user->affectation_service_id,
                 ] : null,
             ],
             'app' => [

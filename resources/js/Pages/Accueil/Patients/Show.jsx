@@ -8,7 +8,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import PatientModal from './Partials/PatientModal';
 
-export default function Show({ patient, rendezVous, canEdit, canBook }) {
+export default function Show({ patient, rendezVous, canEdit, canBook, canDossier }) {
     const { t, locale } = useTrans();
     const [editing, setEditing] = useState(false);
 
@@ -43,6 +43,7 @@ export default function Show({ patient, rendezVous, canEdit, canBook }) {
                             {canEdit && (
                                 <button type="button" onClick={() => setEditing(true)} className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">{t('common.edit')}</button>
                             )}
+                            {canDossier && <Link href={route('dossier.show', patient.id)} className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">{t('medecin.dossier')}</Link>}
                             {canBook && <AddButton onClick={() => router.visit(route('accueil.rendez-vous.create', { patient: patient.id }))}>{t('patient.book')}</AddButton>}
                         </div>
                     </div>

@@ -44,6 +44,7 @@ export default function Show({ rdv }) {
                     <div className="mt-6 flex flex-wrap justify-center gap-3">
                         <a href={route('accueil.rendez-vous.ticket', [rdv.id, '80mm'])} target="_blank" rel="noreferrer" className="rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">{t('rdv.print_80')}</a>
                         <a href={route('accueil.rendez-vous.ticket', [rdv.id, 'a5'])} target="_blank" rel="noreferrer" className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">{t('rdv.print_a5')}</a>
+                        <a href={route('accueil.rendez-vous.certificat', rdv.id)} target="_blank" rel="noreferrer" className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">{t('consult.pdf_certificat')}</a>
                     </div>
                 </section>
 

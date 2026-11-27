@@ -73,6 +73,7 @@ class PatientController extends Controller
             'rendezVous' => $rdvs,
             'canEdit' => $request->user()->hasAnyRole(['secretaire', 'super_admin']),
             'canBook' => $request->user()->hasAnyRole(['secretaire', 'super_admin']),
+            'canDossier' => $request->user()->hasAnyRole(['medecin', 'chef_service', 'super_admin']),
         ]);
     }
 

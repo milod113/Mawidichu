@@ -34,6 +34,21 @@ return [
     ],
 
     [
+        'section' => 'nav.section.medecin',
+        'items' => [
+            ['route' => 'medecin.file', 'label' => 'nav.salle_attente', 'icon' => 'stethoscope', 'roles' => ['medecin', 'chef_service']],
+            ['route' => 'medecin.avis.index', 'label' => 'nav.avis', 'icon' => 'clipboard', 'roles' => ['medecin', 'chef_service']],
+        ],
+    ],
+
+    [
+        'section' => 'nav.section.affichage',
+        'items' => [
+            ['route' => 'tv', 'label' => 'nav.tv', 'icon' => 'tv', 'roles' => ['super_admin']],
+        ],
+    ],
+
+    [
         'section' => 'nav.section.parametrage',
         'items' => [
             ['route' => 'parametrage.services.index', 'label' => 'nav.services', 'icon' => 'building', 'roles' => ['super_admin', 'chef_service']],

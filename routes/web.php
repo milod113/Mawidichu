@@ -2,7 +2,14 @@
 
 use App\Http\Controllers\Accueil\FileController;
 use App\Http\Controllers\Accueil\PatientController;
+use App\Http\Controllers\Dossier\DocumentController;
+use App\Http\Controllers\Dossier\DossierController;
 use App\Http\Controllers\Infirmier\PreconsultationController;
+use App\Http\Controllers\Medecin\AvisController;
+use App\Http\Controllers\Medecin\ConsultationController;
+use App\Http\Controllers\Medecin\FileMedecinController;
+use App\Http\Controllers\Medecin\PdfController;
+use App\Http\Controllers\Tv\TvController;
 use App\Http\Controllers\Parametrage\ExceptionPlanningController;
 use App\Http\Controllers\Accueil\RendezVousController;
 use App\Http\Controllers\Accueil\TicketController;
@@ -22,6 +29,11 @@ Route::redirect('/', '/dashboard');
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
 Route::get('/dashboard', function () {
+    // Le compte kiosque de la salle d'attente n'a qu'un écran.
+    if (auth()->user()->hasRole('ecran_tv')) {
+        return redirect()->route('tv');
+    }
+
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -109,6 +121,50 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('{absence}/appliquer', [ExceptionPlanningController::class, 'appliquer'])->name('appliquer');
         Route::delete('{absence}', [ExceptionPlanningController::class, 'destroy'])->name('destroy');
     });
+});
+
+/*
+| Médecin : file d'attente, appels, consultation, demandes d'avis, documents PDF.
+*/
+Route::middleware(['auth', 'verified', 'role:medecin|chef_service'])->prefix('medecin')->name('medecin.')->group(function () {
+    Route::get('file', [FileMedecinController::class, 'index'])->name('file');
+    Route::post('file/suivant', [FileMedecinController::class, 'suivant'])->name('suivant');
+    Route::post('rendez-vous/{rendezVous}/appeler', [FileMedecinController::class, 'appeler'])->name('appeler');
+    Route::post('rendez-vous/{rendezVous}/rappeler', [FileMedecinController::class, 'rappeler'])->name('rappeler');
+    Route::post('rendez-vous/{rendezVous}/absent', [FileMedecinController::class, 'absent'])->name('absent');
+    Route::post('rendez-vous/{rendezVous}/demarrer', [FileMedecinController::class, 'demarrer'])->name('demarrer');
+
+    Route::get('consultations/{consultation}', [ConsultationController::class, 'show'])->name('consultations.show');
+    Route::put('consultations/{consultation}', [ConsultationController::class, 'update'])->name('consultations.update');
+    Route::get('consultations/{consultation}/disponibilites', [ConsultationController::class, 'disponibilites'])->name('consultations.disponibilites');
+    Route::get('consultations/{consultation}/pdf/{type}', [PdfController::class, 'consultation'])->name('consultations.pdf');
+    Route::post('consultations/{consultation}/avis', [AvisController::class, 'store'])->name('avis.store');
+    Route::get('avis', [AvisController::class, 'index'])->name('avis.index');
+    Route::put('avis/{avis}', [AvisController::class, 'repondre'])->name('avis.repondre');
+    Route::put('favoris', [ConsultationController::class, 'favoris'])->name('favoris');
+});
+
+/*
+| Dossier médical cloisonné et pièces jointes.
+*/
+Route::middleware(['auth', 'verified'])->prefix('dossier')->name('dossier.')->group(function () {
+    Route::get('patients/{patient}', [DossierController::class, 'show'])->middleware('role:medecin|chef_service|super_admin')->name('show');
+    Route::middleware('role:secretaire|medecin|chef_service|super_admin')->group(function () {
+        Route::post('patients/{patient}/documents', [DocumentController::class, 'store'])->name('documents.store');
+        Route::get('documents/{document}', [DocumentController::class, 'download'])->name('documents.download');
+        Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+    });
+});
+
+Route::middleware(['auth', 'verified', 'role:secretaire|super_admin|chef_service|medecin'])
+    ->get('accueil/rendez-vous/{rendezVous}/certificat', [PdfController::class, 'certificat'])->name('accueil.rendez-vous.certificat');
+
+/*
+| Écran TV de la salle d'attente.
+*/
+Route::middleware(['auth', 'role:ecran_tv|super_admin'])->group(function () {
+    Route::get('tv', [TvController::class, 'show'])->name('tv');
+    Route::get('tv/donnees', [TvController::class, 'donnees'])->name('tv.donnees');
 });
 
 require __DIR__.'/auth.php';
