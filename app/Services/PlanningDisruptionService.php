@@ -77,7 +77,7 @@ class PlanningDisruptionService
             $absence->update(['action_appliquee' => $action]);
         });
 
-        ServiceActivity::dispatch($absence->service_id, 'quota', $absence->date_debut->toDateString());
+        ServiceActivity::emit($absence->service_id, 'quota', $absence->date_debut->toDateString());
 
         return $bilan;
     }

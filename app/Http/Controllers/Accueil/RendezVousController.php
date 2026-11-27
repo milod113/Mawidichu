@@ -119,7 +119,7 @@ class RendezVousController extends Controller
             && $request->user()->hasRole('secretaire'));
 
         $rendezVous->delete();
-        ServiceActivity::dispatch($rendezVous->service_id, 'quota', $rendezVous->date_rdv->toDateString());
+        ServiceActivity::emit($rendezVous->service_id, 'quota', $rendezVous->date_rdv->toDateString());
 
         return back()->with('success', 'rdv.deleted');
     }

@@ -77,8 +77,8 @@ class ConsultationService
             throw new QueueException('file.erreur.statut');
         }
         $rdv->update(['statut' => StatutRdv::EnAttenteRetour]);
-        ServiceActivity::dispatch($rdv->service_id, 'file', $rdv->date_rdv->toDateString());
-        PatientCalled::dispatch(['retire' => $rdv->id]);
+        ServiceActivity::emit($rdv->service_id, 'file', $rdv->date_rdv->toDateString());
+        PatientCalled::emit(['retire' => $rdv->id]);
 
         return $rdv;
     }
@@ -97,7 +97,7 @@ class ConsultationService
                 'patient_id' => $rdv->patient_id, 'service_id' => $rdv->service_id, 'medecin_id' => $medecin->id,
             ]);
         });
-        ServiceActivity::dispatch($rdv->service_id, 'file', $rdv->date_rdv->toDateString());
+        ServiceActivity::emit($rdv->service_id, 'file', $rdv->date_rdv->toDateString());
 
         return $consultation;
     }
@@ -125,7 +125,7 @@ class ConsultationService
         });
 
         if ($cloturer) {
-            ServiceActivity::dispatch($consultation->service_id, 'file', today()->toDateString());
+            ServiceActivity::emit($consultation->service_id, 'file', today()->toDateString());
         }
 
         return $consultation->refresh();
@@ -172,13 +172,13 @@ class ConsultationService
         $rdv->loadMissing(['service', 'patient', 'box', 'medecin.user']);
         $service = $rdv->service;
 
-        PatientCalled::dispatch([
+        PatientCalled::emit([
             'id' => $rdv->id, 'service_id' => $service->id, 'aile' => $service->aile,
             'ticket' => $rdv->numero_ticket,
             'nom' => $service->affichage_tv_mode?->value === 'nom' ? mb_strtoupper($rdv->patient->nom).' '.$rdv->patient->prenom : null,
             'box' => $rdv->box?->nom_affichage ?? ($rdv->box ? 'Box '.$rdv->box->numero_box : null),
             'service_nom' => $service->nom, 'at' => $rdv->heure_appel?->toIso8601String(),
         ]);
-        ServiceActivity::dispatch($service->id, 'file', $rdv->date_rdv->toDateString());
+        ServiceActivity::emit($service->id, 'file', $rdv->date_rdv->toDateString());
     }
 }

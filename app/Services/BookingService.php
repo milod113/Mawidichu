@@ -109,7 +109,7 @@ class BookingService
             return $rdv;
         });
 
-        ServiceActivity::dispatch($service->id, 'quota', $date);
+        ServiceActivity::emit($service->id, 'quota', $date);
 
         return $rdv;
     }

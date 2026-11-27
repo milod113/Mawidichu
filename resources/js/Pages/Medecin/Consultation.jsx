@@ -38,8 +38,9 @@ export default function Consultation({ consultation: c, patient, constantes, pre
 
     useEffect(() => {
         if (controle !== 'direct') return;
-        fetch(route('medecin.consultations.disponibilites', c.id), { headers: { Accept: 'application/json' } }).then((r) => r.json()).then(setDispos);
-    }, [controle, c.id]);
+        setChoix('');
+        fetch(route('medecin.consultations.disponibilites', c.id) + `?delai=${f.delai_controle_jours || 0}`, { headers: { Accept: 'application/json' } }).then((r) => r.json()).then(setDispos);
+    }, [controle, c.id, f.delai_controle_jours]);
 
     const ligne = (i, k, v) => set('ordonnance', f.ordonnance.map((l, j) => (j === i ? { ...l, [k]: v } : l)));
     const toggleBilan = (b) => set('bilans', f.bilans.includes(b) ? f.bilans.filter((x) => x !== b) : [...f.bilans, b]);

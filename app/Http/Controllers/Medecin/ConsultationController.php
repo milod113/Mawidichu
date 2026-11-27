@@ -117,7 +117,7 @@ class ConsultationController extends Controller
             return response()->json([]);
         }
 
-        $delai = (int) ($consultation->delai_controle_jours ?: 0);
+        $delai = $request->has('delai') ? max(0, min(730, $request->integer('delai'))) : (int) ($consultation->delai_controle_jours ?: 0);
         $du = today()->addDays($delai);
         $entrees = $availability->forService($consultation->service, $type, $du, $du->copy()->addDays(90), $consultation->medecin)
             ->filter(fn ($e) => $e['bookable'])->take(15)->values()

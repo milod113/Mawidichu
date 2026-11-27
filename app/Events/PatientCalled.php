@@ -21,6 +21,19 @@ class PatientCalled implements ShouldBroadcastNow
     public function __construct(public array $appel) {}
 
     /**
+     * Diffuse sans jamais bloquer l'action métier : si le serveur temps réel (Reverb) est
+     * arrêté, l'erreur est journalisée et les écrans se rafraîchissent par sondage.
+     */
+    public static function emit(mixed ...$args): void
+    {
+        try {
+            static::dispatch(...$args);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
+    /**
      * @return list<Channel>
      */
     public function broadcastOn(): array

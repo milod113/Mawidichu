@@ -139,6 +139,6 @@ class QueueService
 
     private function signaler(RendezVous $rdv): void
     {
-        ServiceActivity::dispatch($rdv->service_id, 'file', $rdv->date_rdv->toDateString());
+        ServiceActivity::emit($rdv->service_id, 'file', $rdv->date_rdv->toDateString());
     }
 }
