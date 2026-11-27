@@ -13,10 +13,11 @@ Le projet suit la feuille de route du cahier des charges, étape par étape.
 | 1 | Socle technique : stack, layout (sidebar, FR/AR RTL, thème), 7 rôles, seeders | ✅ |
 | 2 | Base de données et modèles métier, SoftDeletes, audit | ✅ |
 | 3 | Paramétrage (services, box, types de consultation, médecins, plannings, jours fériés) | ✅ |
-| 4 | Accueil, patients (IPP) et prise de RDV | à venir |
-| 5 | File d'attente, check-in et pré-consultation | à venir |
-| 6 | Poste médecin, appel en salle et écran TV | à venir |
-| 7 | Tableaux de bord, statistiques et exports | à venir |
+| 4 | Accueil, patients (IPP) et prise de RDV | ✅ |
+| 5 | File d'attente, check-in et pré-consultation | ✅ |
+| 6 | Poste médecin, appel en salle et écran TV | ✅ |
+| 7 | Tableaux de bord, statistiques et exports | ✅ |
+| + | Gestion des comptes utilisateurs, absences et basculade | ✅ |
 
 ## Prérequis
 
@@ -65,7 +66,7 @@ Créés uniquement en environnement `local` / `testing` (mot de passe : `MAWID_S
 - **Jours fériés** : la table `jours_feries` est amorcée depuis `database/data/jours_feries_algerie.php`. Les fêtes religieuses sont en statut `estimatif` et doivent être confirmées ou décalées après l'annonce officielle.
 - **Pas de suppression physique** : `SoftDeletes` sur toutes les tables métier ; les données patients / médicales refusent en plus `forceDelete()` (trait `PreventsForceDelete`) et leurs clés étrangères sont en `RESTRICT`.
 - **Audit** : le trait `Auditable` journalise création, modification, suppression, restauration (qui, anciennes / nouvelles valeurs, IP) dans `audit_logs`, table immuable. Les attributs masqués (mot de passe…) n'y figurent jamais. `AuditLog::record()` permet de tracer une action métier explicite.
-- **Cloisonnement** : `Consultation::scopeForService()` limite l'historique médical à un service ; les dérogations par demande d'avis (`DemandeAvis::scopeActive()`) seront branchées à l'Étape 6.
+- **Cloisonnement** : `Consultation::scopeForService()` limite l'historique médical à un service ; `DossierAccess` applique le cloisonnement (service du médecin) et n'ouvre le dossier d'un autre service que pour une demande d'avis inter-spécialités encore valide (`avis_validite_jours`). Direction, secrétaires et infirmiers n'ont aucun accès au contenu médical.
 - **Menu latéral** : déclaré dans `config/navigation.php` (route, libellé, icône, rôles autorisés).
 - **Traductions d'interface** : `lang/ui/fr.json` et `lang/ui/ar.json`.
 
@@ -77,6 +78,19 @@ Menu **Paramétrage** : `Services` (super_admin et chef_service) et `Jours féri
 - Un chef de service ne voit et ne modifie que son service (`ServicePolicy`) ; code, nom et activation du service restent réservés au super admin.
 - Jours fériés : filtre par année, ajout / correction, **décalage de toute la plage d'une fête (±1 jour) et confirmation en un clic** (les jours d'une même fête partagent un `groupe`).
 - Les comptes de démonstration (local / testing) sont accompagnés d'un service Cardiologie complet et d'un service Pédiatrie vide (`DemoDataSeeder`).
+
+## Parcours quotidien (Étapes 4 à 6)
+
+- **Accueil** : recherche / création de patient (IPP `IPP-AAAA-NNNNNN`), prise de RDV avec disponibilités en temps réel (quota par vagues, créneaux dynamiques ou mixte, surbooking, fériés, absences), verrou de 60 s anti-conflit, ticket PDF 80 mm / A5, mode d'attribution centralisé / décentralisé / hybride.
+- **File du jour** (`/accueil/jour`) : check-in, badge de priorité (motif obligatoire, tracé dans `audit_logs`), absents, patients « à replanifier » et contrôles « à planifier ».
+- **Absences** (`/parametrage/absences`) : blocage des vacations et basculade des RDV déjà pris (réaffecter à un confrère, reporter à la prochaine vacation, marquer « à replanifier ») sans jamais supprimer de RDV.
+- **Infirmier** (`/infirmier/preconsultation`) : constantes si la pré-consultation est activée sur le service.
+- **Médecin** (`/medecin/file`) : appeler le suivant / un patient, rappeler, « ne répond pas » (→ en attente de retour), consultation, ordonnance avec favoris, demande de bilan, contrôle programmé directement ou délégué à l'accueil, demandes d'avis senior / inter-spécialités, pièces jointes privées, PDF (ordonnance, bilan, orientation, certificat de présence — en français uniquement).
+- **Écran TV** (`/tv`, compte `ecran_tv`) : appels en temps réel (Reverb) avec repli par sondage, filtre par aile, ticket ou nom selon le service, signal sonore et annonce vocale (bouton « Activer le son » requis par les navigateurs).
+- **Statistiques** (`/statistiques`) : volumes prévus / réalisés / absents / reportés, répartition par type, délai du premier RDV, temps d'attente moyen, charge par praticien et grade ; filtres date, service, médecin, grade ; exports PDF et Excel (journalisés). Un chef de service ne voit que son service.
+- **Utilisateurs** (`/parametrage/utilisateurs`, super admin) : comptes, rôles, affectation, activation, mot de passe, suppression douce, garde-fou du dernier super admin.
+
+Limites connues : les index uniques incluent les lignes supprimées (code de service, numéro de box, type) ; les PDF sont en français (génération hors-ligne sans mise en forme arabe) ; le serveur Reverb doit tourner (`php artisan reverb:start`) pour le temps réel, sinon les écrans se rafraîchissent par sondage.
 
 ## Tests
 

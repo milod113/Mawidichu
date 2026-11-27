@@ -20,6 +20,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('jours_feries', function (Blueprint $table) {
+            $table->dropIndex(['groupe']);
             $table->dropColumn('groupe');
         });
     }

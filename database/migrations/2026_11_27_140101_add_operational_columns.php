@@ -39,7 +39,10 @@ return new class extends Migration
         Schema::table('consultations', function (Blueprint $t) {
             $t->dropConstrainedForeignId('controle_rdv_id');
         });
-        Schema::table('services', fn (Blueprint $t) => $t->dropColumn('aile'));
+        Schema::table('services', function (Blueprint $t) {
+            $t->dropIndex(['aile']);
+            $t->dropColumn('aile');
+        });
         Schema::table('users', function (Blueprint $t) {
             $t->dropConstrainedForeignId('affectation_service_id');
         });
