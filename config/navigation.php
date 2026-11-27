@@ -42,6 +42,13 @@ return [
     ],
 
     [
+        'section' => 'nav.section.pilotage',
+        'items' => [
+            ['route' => 'stats.index', 'label' => 'nav.stats', 'icon' => 'chart', 'roles' => ['direction', 'chef_service', 'super_admin']],
+        ],
+    ],
+
+    [
         'section' => 'nav.section.affichage',
         'items' => [
             ['route' => 'tv', 'label' => 'nav.tv', 'icon' => 'tv', 'roles' => ['super_admin']],

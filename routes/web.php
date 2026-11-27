@@ -9,6 +9,7 @@ use App\Http\Controllers\Medecin\AvisController;
 use App\Http\Controllers\Medecin\ConsultationController;
 use App\Http\Controllers\Medecin\FileMedecinController;
 use App\Http\Controllers\Medecin\PdfController;
+use App\Http\Controllers\Stats\StatsController;
 use App\Http\Controllers\Tv\TvController;
 use App\Http\Controllers\Parametrage\ExceptionPlanningController;
 use App\Http\Controllers\Accueil\RendezVousController;
@@ -158,6 +159,15 @@ Route::middleware(['auth', 'verified'])->prefix('dossier')->name('dossier.')->gr
 
 Route::middleware(['auth', 'verified', 'role:secretaire|super_admin|chef_service|medecin'])
     ->get('accueil/rendez-vous/{rendezVous}/certificat', [PdfController::class, 'certificat'])->name('accueil.rendez-vous.certificat');
+
+/*
+| Statistiques : direction (tout), chef de service (son service), super admin.
+*/
+Route::middleware(['auth', 'verified', 'role:direction|chef_service|super_admin'])->prefix('statistiques')->name('stats.')->group(function () {
+    Route::get('/', [StatsController::class, 'index'])->name('index');
+    Route::get('pdf', [StatsController::class, 'pdf'])->name('pdf');
+    Route::get('excel', [StatsController::class, 'excel'])->name('excel');
+});
 
 /*
 | Écran TV de la salle d'attente.
