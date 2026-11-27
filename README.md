@@ -12,7 +12,7 @@ Le projet suit la feuille de route du cahier des charges, étape par étape.
 |---|---|---|
 | 1 | Socle technique : stack, layout (sidebar, FR/AR RTL, thème), 7 rôles, seeders | ✅ |
 | 2 | Base de données et modèles métier, SoftDeletes, audit | ✅ |
-| 3 | Paramétrage (services, box, types de consultation, médecins, plannings, jours fériés) | à venir |
+| 3 | Paramétrage (services, box, types de consultation, médecins, plannings, jours fériés) | ✅ |
 | 4 | Accueil, patients (IPP) et prise de RDV | à venir |
 | 5 | File d'attente, check-in et pré-consultation | à venir |
 | 6 | Poste médecin, appel en salle et écran TV | à venir |
@@ -68,6 +68,15 @@ Créés uniquement en environnement `local` / `testing` (mot de passe : `MAWID_S
 - **Cloisonnement** : `Consultation::scopeForService()` limite l'historique médical à un service ; les dérogations par demande d'avis (`DemandeAvis::scopeActive()`) seront branchées à l'Étape 6.
 - **Menu latéral** : déclaré dans `config/navigation.php` (route, libellé, icône, rôles autorisés).
 - **Traductions d'interface** : `lang/ui/fr.json` et `lang/ui/ar.json`.
+
+## Paramétrage (Étape 3)
+
+Menu **Paramétrage** : `Services` (super_admin et chef_service) et `Jours fériés` (super_admin).
+
+- Fiche service à onglets : général (mode de planification, attribution des RDV, pré-consultation, affichage TV, documents à ramener), box, types de consultation (durée, couleur, bilans requis), médecins (grade, durée / quota par défaut, surbooking en places ou en %), plannings types (affectation nominative **ou** par box / équipe ; quota et vagues selon le mode).
+- Un chef de service ne voit et ne modifie que son service (`ServicePolicy`) ; code, nom et activation du service restent réservés au super admin.
+- Jours fériés : filtre par année, ajout / correction, **décalage de toute la plage d'une fête (±1 jour) et confirmation en un clic** (les jours d'une même fête partagent un `groupe`).
+- Les comptes de démonstration (local / testing) sont accompagnés d'un service Cardiologie complet et d'un service Pédiatrie vide (`DemoDataSeeder`).
 
 ## Tests
 

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Amorce la table `jours_feries` à partir de database/data/jours_feries_algerie.php.
@@ -43,6 +44,7 @@ class JourFerieSeeder extends Seeder
                         'type' => 'mobile',
                         'est_recurrent' => false,
                         'statut_confirmation' => 'estimatif',
+                        'groupe' => Str::slug($libelle).'-'.$debut->year,
                     ], $now);
                 }
             }
@@ -57,6 +59,11 @@ class JourFerieSeeder extends Seeder
         $key = ['libelle' => $row['libelle'], 'date_ferie' => $row['date_ferie']];
 
         if (DB::table('jours_feries')->where($key)->exists()) {
+            // Données déjà présentes : on complète seulement le groupe s'il manque.
+            if (isset($row['groupe'])) {
+                DB::table('jours_feries')->where($key)->whereNull('groupe')->update(['groupe' => $row['groupe']]);
+            }
+
             return;
         }
 

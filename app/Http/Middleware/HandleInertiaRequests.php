@@ -52,6 +52,7 @@ class HandleInertiaRequests extends Middleware
                 'etablissement' => config('mawid.etablissement'),
                 'default_theme' => config('mawid.default_theme'),
             ],
+            'flash' => ['success' => fn () => $request->session()->get('success')],
             'locale' => $locale,
             'dir' => $locales[$locale]['dir'] ?? 'ltr',
             'locales' => collect($locales)

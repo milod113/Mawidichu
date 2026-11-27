@@ -23,4 +23,12 @@ return [
         ],
     ],
 
+    [
+        'section' => 'nav.section.parametrage',
+        'items' => [
+            ['route' => 'parametrage.services.index', 'label' => 'nav.services', 'icon' => 'building', 'roles' => ['super_admin', 'chef_service']],
+            ['route' => 'parametrage.jours-feries.index', 'label' => 'nav.jours_feries', 'icon' => 'calendar', 'roles' => ['super_admin']],
+        ],
+    ],
+
 ];

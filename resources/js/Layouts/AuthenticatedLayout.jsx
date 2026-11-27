@@ -4,6 +4,7 @@ import Icon from '@/Components/Icon';
 import LocaleSwitcher from '@/Components/LocaleSwitcher';
 import ThemeSwitcher from '@/Components/ThemeSwitcher';
 import { useTrans } from '@/lib/i18n';
+import FlashMessage from '@/Components/FlashMessage';
 import { useDocumentDirection } from '@/lib/useDocumentDirection';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -33,7 +34,7 @@ function Sidebar({ onNavigate }) {
                         </p>
                         <ul className="space-y-1">
                             {section.items.map((item) => {
-                                const active = route().current(item.route);
+                                const active = route().current(item.route.replace(/\.index$/, '') + '*') || route().current(item.route);
 
                                 return (
                                     <li key={item.route}>
@@ -138,7 +139,10 @@ export default function AuthenticatedLayout({ header, children }) {
                     </Dropdown>
                 </header>
 
-                <main className="p-4 sm:p-6 lg:p-8">{children}</main>
+                <main className="p-4 sm:p-6 lg:p-8">
+                    <FlashMessage />
+                    {children}
+                </main>
             </div>
         </div>
     );
