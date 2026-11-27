@@ -59,6 +59,7 @@ return [
         'section' => 'nav.section.parametrage',
         'items' => [
             ['route' => 'parametrage.services.index', 'label' => 'nav.services', 'icon' => 'building', 'roles' => ['super_admin', 'chef_service']],
+            ['route' => 'parametrage.utilisateurs.index', 'label' => 'nav.utilisateurs', 'icon' => 'users', 'roles' => ['super_admin']],
             ['route' => 'parametrage.absences.index', 'label' => 'nav.absences', 'icon' => 'calendar', 'roles' => ['super_admin', 'chef_service']],
             ['route' => 'parametrage.jours-feries.index', 'label' => 'nav.jours_feries', 'icon' => 'calendar', 'roles' => ['super_admin']],
         ],

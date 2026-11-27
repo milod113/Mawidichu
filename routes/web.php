@@ -21,6 +21,7 @@ use App\Http\Controllers\Parametrage\MedecinController;
 use App\Http\Controllers\Parametrage\PlanningTypeController;
 use App\Http\Controllers\Parametrage\ServiceController;
 use App\Http\Controllers\Parametrage\TypeConsultationController;
+use App\Http\Controllers\Parametrage\UtilisateurController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -70,6 +71,13 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
         Route::post('{jourFerie}/confirmer', [JourFerieController::class, 'confirmer'])->name('confirmer');
         Route::post('{jourFerie}/decaler', [JourFerieController::class, 'decaler'])->name('decaler');
     });
+
+Route::middleware(['auth', 'verified', 'role:super_admin'])->prefix('parametrage/utilisateurs')->name('parametrage.utilisateurs.')->group(function () {
+    Route::get('/', [UtilisateurController::class, 'index'])->name('index');
+    Route::post('/', [UtilisateurController::class, 'store'])->name('store');
+    Route::put('{utilisateur}', [UtilisateurController::class, 'update'])->name('update');
+    Route::delete('{utilisateur}', [UtilisateurController::class, 'destroy'])->name('destroy');
+});
 
 /*
 | Accueil : patients (IPP) et prise de rendez-vous. Lecture des patients ouverte
