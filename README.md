@@ -11,7 +11,7 @@ Le projet suit la feuille de route du cahier des charges, étape par étape.
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Socle technique : stack, layout (sidebar, FR/AR RTL, thème), 7 rôles, seeders | ✅ |
-| 2 | Base de données et modèles métier, SoftDeletes, audit | à venir |
+| 2 | Base de données et modèles métier, SoftDeletes, audit | ✅ |
 | 3 | Paramétrage (services, box, types de consultation, médecins, plannings, jours fériés) | à venir |
 | 4 | Accueil, patients (IPP) et prise de RDV | à venir |
 | 5 | File d'attente, check-in et pré-consultation | à venir |
@@ -63,7 +63,9 @@ Créés uniquement en environnement `local` / `testing` (mot de passe : `MAWID_S
 
 - **Zéro paramètre figé dans le code** : l'établissement, la langue par défaut, le thème, etc. passent par `config/mawid.php` et `.env` ; les paramètres métier (durées, quotas, vacations…) seront stockés en base.
 - **Jours fériés** : la table `jours_feries` est amorcée depuis `database/data/jours_feries_algerie.php`. Les fêtes religieuses sont en statut `estimatif` et doivent être confirmées ou décalées après l'annonce officielle.
-- **Pas de suppression physique** : `SoftDeletes` sur les données (dès l'Étape 1 pour les utilisateurs et les jours fériés).
+- **Pas de suppression physique** : `SoftDeletes` sur toutes les tables métier ; les données patients / médicales refusent en plus `forceDelete()` (trait `PreventsForceDelete`) et leurs clés étrangères sont en `RESTRICT`.
+- **Audit** : le trait `Auditable` journalise création, modification, suppression, restauration (qui, anciennes / nouvelles valeurs, IP) dans `audit_logs`, table immuable. Les attributs masqués (mot de passe…) n'y figurent jamais. `AuditLog::record()` permet de tracer une action métier explicite.
+- **Cloisonnement** : `Consultation::scopeForService()` limite l'historique médical à un service ; les dérogations par demande d'avis (`DemandeAvis::scopeActive()`) seront branchées à l'Étape 6.
 - **Menu latéral** : déclaré dans `config/navigation.php` (route, libellé, icône, rôles autorisés).
 - **Traductions d'interface** : `lang/ui/fr.json` et `lang/ui/ar.json`.
 
