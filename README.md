@@ -78,6 +78,7 @@ Menu **Paramétrage** : `Services` (super_admin et chef_service) et `Jours féri
 - Un chef de service ne voit et ne modifie que son service (`ServicePolicy`) ; code, nom et activation du service restent réservés au super admin.
 - Jours fériés : filtre par année, ajout / correction, **décalage de toute la plage d'une fête (±1 jour) et confirmation en un clic** (les jours d'une même fête partagent un `groupe`).
 - Les comptes de démonstration (local / testing) sont accompagnés d'un service Cardiologie complet et d'un service Pédiatrie vide (`DemoDataSeeder`).
+- `DemoPatientsSeeder` (local / testing uniquement, idempotent) ajoute 30 patients fictifs avec IPP, des RDV dans les 11 statuts (passés, du jour, à venir), 7 consultations avec ordonnance, constantes, deux demandes d'avis, une absence planifiée, ainsi qu'un service Dermatologie et son médecin (`dermato@mawid.local`). `php artisan migrate:fresh --seed` suffit à l'obtenir.
 
 ## Parcours quotidien (Étapes 4 à 6)
 

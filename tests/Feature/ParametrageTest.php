@@ -213,6 +213,7 @@ class ParametrageTest extends TestCase
         $box = $service->boxes()->first();
         $this->actingAs($this->chef());
         $url = "/parametrage/services/{$service->id}/plannings";
+        $avant = PlanningType::where('service_id', $service->id)->count();
         $base = ['jour_semaine' => 3, 'heure_debut' => '09:00', 'heure_fin' => '12:00', 'quota_rdv' => 15,
             'taille_vague' => 5, 'intervalle_vague_min' => 30, 'is_active' => true];
 
@@ -228,7 +229,7 @@ class ParametrageTest extends TestCase
         ])->assertSessionHasNoErrors();
 
         $this->post($url, [...$base, 'medecin_id' => $medecin->id])->assertSessionHasNoErrors();
-        $this->assertSame(3, PlanningType::where('service_id', $service->id)->count());
+        $this->assertSame($avant + 2, PlanningType::where('service_id', $service->id)->count());
     }
 
     public function test_planning_cannot_use_a_doctor_from_another_service(): void
