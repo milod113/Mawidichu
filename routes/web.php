@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Accueil\FileController;
 use App\Http\Controllers\Accueil\PatientController;
+use App\Http\Controllers\Infirmier\PreconsultationController;
+use App\Http\Controllers\Parametrage\ExceptionPlanningController;
 use App\Http\Controllers\Accueil\RendezVousController;
 use App\Http\Controllers\Accueil\TicketController;
 use App\Http\Controllers\LocaleController;
@@ -79,6 +82,32 @@ Route::middleware(['auth', 'verified'])->prefix('accueil')->name('accueil.')->gr
         Route::get('patients/{patient}', [PatientController::class, 'show'])->name('patients.show');
         Route::get('rendez-vous/{rendezVous}', [RendezVousController::class, 'show'])->name('rendez-vous.show');
         Route::get('rendez-vous/{rendezVous}/ticket/{format}', [TicketController::class, 'show'])->name('rendez-vous.ticket');
+    });
+});
+
+/*
+| File du jour : pointage, priorités, absents (accueil) et pré-consultation (infirmier).
+*/
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::middleware('role:secretaire|super_admin|chef_service|medecin|infirmier')->get('accueil/jour', [FileController::class, 'index'])->name('accueil.jour');
+
+    Route::middleware('role:secretaire|super_admin|chef_service')->prefix('accueil/rendez-vous/{rendezVous}')->name('accueil.rendez-vous.')->group(function () {
+        Route::post('arrivee', [FileController::class, 'checkIn'])->name('arrivee');
+        Route::post('absent', [FileController::class, 'absent'])->name('absent');
+        Route::post('priorite', [FileController::class, 'priorite'])->name('priorite');
+    });
+
+    Route::middleware('role:infirmier|super_admin')->prefix('infirmier/preconsultation')->name('infirmier.preconsultation.')->group(function () {
+        Route::get('/', [PreconsultationController::class, 'index'])->name('index');
+        Route::post('{rendezVous}/demarrer', [PreconsultationController::class, 'demarrer'])->name('demarrer');
+        Route::post('{rendezVous}/constantes', [PreconsultationController::class, 'store'])->name('store');
+    });
+
+    Route::middleware('role:super_admin|chef_service')->prefix('parametrage/absences')->name('parametrage.absences.')->group(function () {
+        Route::get('/', [ExceptionPlanningController::class, 'index'])->name('index');
+        Route::post('/', [ExceptionPlanningController::class, 'store'])->name('store');
+        Route::post('{absence}/appliquer', [ExceptionPlanningController::class, 'appliquer'])->name('appliquer');
+        Route::delete('{absence}', [ExceptionPlanningController::class, 'destroy'])->name('destroy');
     });
 });
 

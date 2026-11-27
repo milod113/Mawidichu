@@ -24,6 +24,7 @@ class BookingService
         private AvailabilityService $availability,
         private SlotLockService $locks,
         private BookingRules $rules,
+        private TicketNumberer $numerotation,
     ) {}
 
     public function book(
@@ -84,14 +85,8 @@ class BookingService
                 throw new BookingException('rdv.erreur.doublon');
             }
 
-            // Verrouille la ligne du service pour numéroter les tickets sans collision.
-            Service::whereKey($service->id)->lockForUpdate()->first();
-            $dernier = RendezVous::withTrashed()->where('service_id', $service->id)->whereDate('date_rdv', $date)
-                ->where('numero_ticket', 'like', $service->code.'-%')->orderByDesc('numero_ticket')->value('numero_ticket');
-            $numero = $dernier ? ((int) substr($dernier, strlen($service->code) + 1)) + 1 : 1;
-
             $rdv = RendezVous::create([
-                'numero_ticket' => $service->code.'-'.str_pad((string) $numero, config('mawid.ticket_pad'), '0', STR_PAD_LEFT),
+                'numero_ticket' => $this->numerotation->next($service, $date),
                 'patient_id' => $patient->id,
                 'service_id' => $service->id,
                 'medecin_id' => $planning->medecin_id,
