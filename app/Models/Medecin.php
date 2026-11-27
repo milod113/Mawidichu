@@ -28,6 +28,7 @@ class Medecin extends Model
             'tolere_surbooking' => 'boolean',
             'valeur_surbooking' => 'integer',
             'surbooking_unite' => SurbookingUnite::class,
+            'medicaments_favoris_json' => 'array',
         ];
     }
 

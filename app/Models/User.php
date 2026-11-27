@@ -7,6 +7,7 @@ use App\Enums\RoleName;
 use App\Models\Concerns\Auditable;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,6 +30,7 @@ class User extends Authenticatable
         'telephone',
         'is_active',
         'locale',
+        'affectation_service_id',
         'password',
     ];
 
@@ -56,6 +58,32 @@ class User extends Authenticatable
         return $this->hasRole(RoleName::ChefService->value)
             && $this->medecin !== null
             && $this->medecin->service_id === $id;
+    }
+
+    public function affectationService(): BelongsTo
+    {
+        return $this->belongsTo(Service::class, 'affectation_service_id');
+    }
+
+    /**
+     * Le poste voit-il ce service ? Direction et super admin : tous ; guichet central
+     * (secrétaire sans affectation) : tous ; sinon uniquement son propre service.
+     */
+    public function canAccessService(Service|int $service): bool
+    {
+        $id = $service instanceof Service ? $service->getKey() : $service;
+
+        if ($this->hasAnyRole([RoleName::SuperAdmin->value, RoleName::Direction->value])) {
+            return true;
+        }
+
+        if ($this->hasRole(RoleName::Secretaire->value) && $this->affectation_service_id === null) {
+            return true;
+        }
+
+        $propre = $this->medecin?->service_id ?? $this->affectation_service_id;
+
+        return $propre !== null && $propre === $id;
     }
 
     public function medecin(): HasOne

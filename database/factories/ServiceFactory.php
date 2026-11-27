@@ -20,6 +20,7 @@ class ServiceFactory extends Factory
             'mode_planification' => ModePlanification::QuotaVague,
             'mode_attribution_rdv' => ModeAttributionRdv::Hybride,
             'nb_box' => 1,
+            'is_active' => true,
         ];
     }
 }

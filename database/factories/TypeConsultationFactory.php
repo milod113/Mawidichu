@@ -19,6 +19,7 @@ class TypeConsultationFactory extends Factory
             'code' => CodeConsultation::PremiereConsultation,
             'libelle' => 'Première consultation',
             'duree_minutes' => 20,
+            'is_active' => true,
         ];
     }
 }

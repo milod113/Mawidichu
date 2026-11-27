@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Accueil\PatientController;
+use App\Http\Controllers\Accueil\RendezVousController;
+use App\Http\Controllers\Accueil\TicketController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Parametrage\BoxController;
 use App\Http\Controllers\Parametrage\JourFerieController;
@@ -51,5 +54,32 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])
         Route::post('{jourFerie}/confirmer', [JourFerieController::class, 'confirmer'])->name('confirmer');
         Route::post('{jourFerie}/decaler', [JourFerieController::class, 'decaler'])->name('decaler');
     });
+
+/*
+| Accueil : patients (IPP) et prise de rendez-vous. Lecture des patients ouverte
+| aux médecins ; création / modification et prise de RDV réservées à l'accueil.
+*/
+Route::middleware(['auth', 'verified'])->prefix('accueil')->name('accueil.')->group(function () {
+    Route::middleware('role:secretaire|super_admin|medecin|chef_service')->group(function () {
+        Route::get('patients', [PatientController::class, 'index'])->name('patients.index');
+    });
+
+    Route::middleware('role:secretaire|super_admin')->group(function () {
+        Route::post('patients', [PatientController::class, 'store'])->name('patients.store');
+        Route::put('patients/{patient}', [PatientController::class, 'update'])->name('patients.update');
+
+        Route::get('rendez-vous/nouveau', [RendezVousController::class, 'create'])->name('rendez-vous.create');
+        Route::post('rendez-vous', [RendezVousController::class, 'store'])->name('rendez-vous.store');
+        Route::post('rendez-vous/verrou', [RendezVousController::class, 'verrou'])->name('rendez-vous.verrou');
+        Route::delete('rendez-vous/verrou', [RendezVousController::class, 'liberer'])->name('rendez-vous.liberer');
+        Route::delete('rendez-vous/{rendezVous}', [RendezVousController::class, 'destroy'])->name('rendez-vous.destroy');
+    });
+
+    Route::middleware('role:secretaire|super_admin|medecin|chef_service')->group(function () {
+        Route::get('patients/{patient}', [PatientController::class, 'show'])->name('patients.show');
+        Route::get('rendez-vous/{rendezVous}', [RendezVousController::class, 'show'])->name('rendez-vous.show');
+        Route::get('rendez-vous/{rendezVous}/ticket/{format}', [TicketController::class, 'show'])->name('rendez-vous.ticket');
+    });
+});
 
 require __DIR__.'/auth.php';

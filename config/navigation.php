@@ -24,6 +24,14 @@ return [
     ],
 
     [
+        'section' => 'nav.section.accueil',
+        'items' => [
+            ['route' => 'accueil.patients.index', 'label' => 'nav.patients', 'icon' => 'users', 'roles' => ['secretaire', 'super_admin', 'medecin', 'chef_service']],
+            ['route' => 'accueil.rendez-vous.create', 'label' => 'nav.rdv_nouveau', 'icon' => 'plus', 'roles' => ['secretaire', 'super_admin']],
+        ],
+    ],
+
+    [
         'section' => 'nav.section.parametrage',
         'items' => [
             ['route' => 'parametrage.services.index', 'label' => 'nav.services', 'icon' => 'building', 'roles' => ['super_admin', 'chef_service']],

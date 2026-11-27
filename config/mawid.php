@@ -48,4 +48,65 @@ return [
     */
     'seed_email_domain' => env('MAWID_SEED_EMAIL_DOMAIN', 'mawid.local'),
 
+    /*
+    | Numérotation. IPP : {prefix}-{année}-{séquence sur ipp_pad chiffres}.
+    | Ticket : {code du service}-{séquence du jour sur ticket_pad chiffres}.
+    */
+    'ipp_prefix' => env('MAWID_IPP_PREFIX', 'IPP'),
+    'ipp_pad' => (int) env('MAWID_IPP_PAD', 6),
+    'ticket_pad' => (int) env('MAWID_TICKET_PAD', 3),
+
+    /*
+    | Réservation temporaire d'une place pendant la prise de rendez-vous (secondes).
+    */
+    'verrou_secondes' => (int) env('MAWID_VERROU_SECONDES', 60),
+
+    /*
+    | Statuts qui libèrent la place (le RDV n'occupe plus la vacation).
+    */
+    // Horizon (jours) de recherche de la prochaine disponibilité.
+    'horizon_jours' => (int) env('MAWID_HORIZON_JOURS', 180),
+
+    'statuts_liberant_place' => ['reporte', 'a_replanifier'],
+
+    /*
+    | Durée de validité (jours) de l'accès temporaire accordé par une demande d'avis
+    | inter-spécialités.
+    */
+    'avis_validite_jours' => (int) env('MAWID_AVIS_VALIDITE_JOURS', 7),
+
+    /*
+    | File d'attente : rang des badges de priorité (plus grand = passe avant).
+    | Par défaut tous à 0 : l'ordre réel est l'heure de check-in. À ajuster selon
+    | la politique de l'établissement.
+    */
+    'queue_priority_rank' => [
+        'normal' => 0,
+        'personnel_chu' => 0,
+        'orientation_inter_services' => 0,
+        'hors_wilaya' => 0,
+        'personne_agee_enceinte' => 0,
+    ],
+
+    /*
+    | Pièces jointes patients : taille max (Ko) et extensions acceptées.
+    */
+    'upload_max_kb' => (int) env('MAWID_UPLOAD_MAX_KB', 10240),
+    'upload_extensions' => ['pdf', 'jpg', 'jpeg', 'png'],
+
+    /*
+    | Demandes de bilan : examens proposés en cases à cocher (saisie libre possible en plus).
+    */
+    'bilans_courants' => [
+        'NFS', 'Glycémie à jeun', 'HbA1c', 'Urée / Créatinine', 'Bilan lipidique',
+        'Bilan hépatique', 'CRP', 'Ionogramme sanguin', 'ECG', 'Échographie',
+        'Radiographie thoracique', 'Écho-Doppler',
+    ],
+
+    /*
+    | Écran TV : nombre d'appels récents affichés et rafraîchissement de secours (secondes).
+    */
+    'tv_appels_affiches' => (int) env('MAWID_TV_APPELS', 6),
+    'tv_refresh_secondes' => (int) env('MAWID_TV_REFRESH', 30),
+
 ];
